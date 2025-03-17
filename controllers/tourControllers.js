@@ -159,3 +159,50 @@ exports.getASingleTour=async(req,res)=>{
     }
    
 }
+exports.getMonthlyPlan=async(req,res)=>{
+    try{
+        const year = req.params.year*1;
+        const plan = await Tour.aggregate([
+           { $unwind:'$startDates'},{//unwind actually divides and array and returns diff. docs 
+            $match:{
+                startDates:{
+                    
+                    $gte:new Date(`${year}-01-01`),
+                    $lte:new Date(`${year}-12-31`)
+                }
+            }
+           },
+           {
+              $group:{
+                _id:{$month:'$startDates'},
+                numTour:{$sum:1},
+                tours:{$push:'$name'}
+              }
+           },
+           {
+            $sort:{
+                numTour:-1
+            }
+           },
+           {
+
+               $addFields:{month:'$_id'}
+           },
+           {
+            $project:{_id:0}
+           }
+
+        ])
+        res.status(200).json({
+            status:"successful",
+            results:plan.length,
+            plan
+        })
+    }catch(err){
+        res.status(404).json({
+            status:'fail',
+            errorName:err.name,
+            errorMessage:err.message
+        })
+    }
+}
