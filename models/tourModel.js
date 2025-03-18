@@ -41,6 +41,10 @@ const tourSchema=new mongoose.Schema({
         trim:true,
         required:[true,'Tour summary is required']
     },
+    secretTour:{
+           type:Boolean,
+           default:false
+    },
     description:{
         type:String,
         trim:true,
@@ -66,6 +70,12 @@ tourSchema.virtual('durationWeeks').get(function(){
 tourSchema.pre('save',function(next){
     this.slug = slugify(this.name,{lower:true});
     next();
+})
+//QUERY MIDDLEWARE 
+tourSchema.pre(/^find/,function(next){ // ^ means all starting with find like findOne
+         this.find({secretTour:{$ne:true}})
+    next();
+
 })
 const Tour = mongoose.model('Tour',tourSchema)
 
