@@ -77,6 +77,11 @@ tourSchema.pre(/^find/,function(next){ // ^ means all starting with find like fi
     next();
 
 })
+//AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate',function(next){
+    this.pipeline().unshift({$match:{secretTour:{$ne:true }}})//didn't show secretTour in aggregation
+    next()
+})
 const Tour = mongoose.model('Tour',tourSchema)
 
 module.exports=Tour;
