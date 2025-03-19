@@ -114,7 +114,8 @@ exports.postTour=async(req,res)=>{
 exports.updateTour=async(req,res)=>{
    try{
     const updatedTour = await Tour.findByIdAndUpdate(req.params.id,req.body,{
-        new:true
+        new:true,
+        runValidators:true
     })
     res.status(201).json({
         status:'success',
