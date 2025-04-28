@@ -3,6 +3,7 @@ const {promisify}= require('util')
 const catchAsync = require("../utils/catchAsync");
 const jwt = require('jsonwebtoken')
 const AppError = require("../utils/appError")
+const sendEmail = require("../utils/email")
 
 const signToken=id=>{
    return jwt.sign({id},'secret',{
@@ -15,7 +16,8 @@ exports.signup=catchAsync(async(req,res,next)=>{
         email:req.body.email,
         password:req.body.password,
         confirmPassword:req.body.confirmPassword,
-        changedPasswordAt:req.body.changedPasswordAt
+        changedPasswordAt:req.body.changedPasswordAt,
+        role:req.body.role
     });
 
     const token = signToken(newUser._id)
@@ -80,3 +82,47 @@ exports.protect = catchAsync(async(req,res,next)=>{
     
    
 })
+exports.restrictTo = (...roles) => {
+    return (req,res,next)=>{
+       if(!roles.includes(req.user.role)){
+        return next(new AppError('You are not eligible to perform this task',403))
+       }
+
+       next()
+    }
+}
+exports.forgotPassword=catchAsync(async(req,res,next)=>{
+    const {email} = req.body;
+const user = await User.findOne({email})
+if(!user){
+    return next(new AppError('User Not Found',404))
+}
+const resetToken = user.createResetPasswordToken()
+await user.save({validateBeforeSave:false})
+//http://localhost:5000
+//${req.protocol}://${req.get('host')}
+const resetURL = `http://localhost:5000/api/users/resetpassword/${resetToken}`
+const message = `forget passowrd? submit request to ${resetURL}`
+try{
+    await sendEmail({
+        email:user.email,
+        subject:'bhule gecho password?',
+        message
+    })
+    res.status(200).json({
+        status:'success',
+        message:"token send to email"
+    })
+}catch(err){
+user.passwordResetToken=undefined
+user.passwordResetExpire=undefined
+console.log(err)
+await user.save({validateBeforeSave:false})
+return next(new AppError('error in sending email',402))
+
+}
+
+})
+exports.resetPassword=(req,res,next)=>{
+
+}
