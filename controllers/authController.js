@@ -147,3 +147,24 @@ exports.resetPassword=catchAsync(async(req,res,next)=>{
     })
 
 })
+
+exports.updatePassword = catchAsync(async(req,res,next)=>{
+    const user = await User.findById(req.user.id);
+    if(!user){
+        return next(new AppError('user not found',404));
+    }
+    const currentPostedPassword = req.body.currentPassword;
+    const isCorrect = await user.isCorrectPassword(currentPostedPassword,user.password);
+    if(!isCorrect){
+        return next(new AppError('Invalid Password',401))
+    }
+    user.password=req.body.password;
+    user.confirmPassword=req.body.confirmPassword;
+    await user.save()
+    const token =signToken(user._id)
+    res.status(200).json({
+        status:'success',
+        token
+    })
+
+})
