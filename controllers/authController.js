@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const crypto = require('crypto')
 const {promisify}= require('util')
 const catchAsync = require("../utils/catchAsync");
 const jwt = require('jsonwebtoken')
@@ -123,6 +124,26 @@ return next(new AppError('error in sending email',402))
 }
 
 })
-exports.resetPassword=(req,res,next)=>{
+exports.resetPassword=catchAsync(async(req,res,next)=>{
+     //1) get user based on token
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+    const user = await User.findOne({passwordResetToken:hashedToken,passwordResetExpire:{$gt:Date.now()}})
 
-}
+    //2) if no user exists , give error
+
+    if(!user){
+        return next(new AppError('token is invalid or has expired',404))
+    }
+    user.password = req.body.password;
+    user.confirmPassword = req.body.confirmPassword;
+    user.passwordResetToken=undefined;
+    user.passwordResetExpire=undefined;
+    await user.save()
+
+    const token =signToken(user._id)
+    res.status(200).json({
+        status:'success',
+        token
+    })
+
+})

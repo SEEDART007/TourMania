@@ -51,6 +51,12 @@ this.password =await  bcrypt.hash(this.password,12);
 this.confirmPassword = undefined;// no need to save this in db so its just needed for validation
 next()
 })
+userSchema.pre('save',function(next){
+    if(!this.isModified('password')||this.isNew) return next();
+
+    this.changedPasswordAt=Date.now()-1000;
+    next()
+})
 userSchema.methods.isCorrectPassword = async function(canPass,userPass){
     return await bcrypt.compare(canPass,userPass);
 }
