@@ -42,7 +42,11 @@ const userSchema = new mongoose.Schema({
     type: Date
    },
    passwordResetToken:String,
-   passwordResetExpire:Date
+   passwordResetExpire:Date,
+   active:{
+    type:Boolean,
+    default:true
+   }
 })
 userSchema.pre('save',async function(next){
 if(!this.isModified('password')) return next();
@@ -50,6 +54,12 @@ if(!this.isModified('password')) return next();
 this.password =await  bcrypt.hash(this.password,12);
 this.confirmPassword = undefined;// no need to save this in db so its just needed for validation
 next()
+})
+
+//works with every find
+userSchema.pre(/^find/,function(next){
+    this.find({active:{$ne:false}})
+    next()
 })
 userSchema.pre('save',function(next){
     if(!this.isModified('password')||this.isNew) return next();

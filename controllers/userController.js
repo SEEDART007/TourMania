@@ -10,11 +10,13 @@ const filterObj = (obj,...allowedFields)=>{
     })
     return newObj;
 }
-exports.getUser=(req,res)=>{
+exports.getUser=catchAsync(async(req,res,next)=>{
+    const user = await User.find()
     res.status(200).json({
-        message:'you have reached to user route'
+        status:'success',
+        user
     })
-}
+})
 
 exports.updateMe = catchAsync(async(req,res,next)=>{
     if(req.body.password || req.body.confirmPassword){
@@ -27,5 +29,13 @@ exports.updateMe = catchAsync(async(req,res,next)=>{
     res.status(200).json({
         status:'success',
         updatedUser
+    })
+})
+exports.deleteMe = catchAsync(async(req,res,next)=>{
+    const user = await User.findByIdAndUpdate(req.user.id,{active:false})
+
+    res.status(204).json({
+        status:'success',
+        message:"user account successfully deactivated"
     })
 })
