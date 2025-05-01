@@ -5,7 +5,22 @@ const catchAsync = require("../utils/catchAsync");
 const jwt = require('jsonwebtoken')
 const AppError = require("../utils/appError")
 const sendEmail = require("../utils/email")
+const sendToken = (user,statusCode,res) =>{
+    const token = signToken(user._id);
+     
+    res.cookie('jwt',token,{
+        expires: new Date(Date.now() + '90'*24*60*60*1000),
+        httpOnly:true
+    })
 
+    res.status(statusCode).json({
+        status:'success',
+        token,
+        data:{
+            user
+        }
+    })
+}
 const signToken=id=>{
    return jwt.sign({id},'secret',{
         expiresIn:'90d'
@@ -21,16 +36,7 @@ exports.signup=catchAsync(async(req,res,next)=>{
         role:req.body.role
     });
 
-    const token = signToken(newUser._id)
-
-
-    res.status(201).json({
-       status:'success',
-       token,
-        data:{
-           user: newUser
-        }
-    })
+   sendToken(newUser,201,res);
 });
 
 exports.login=catchAsync(async(req,res,next)=>{
@@ -45,11 +51,7 @@ exports.login=catchAsync(async(req,res,next)=>{
         return next(new AppError('provide valid user and password',401))
     }
 
-const token =signToken(user._id)
-    res.status(200).json({
-        status:'success',
-        token
-    })
+    sendToken(user,200,res);
 })
 
 exports.protect = catchAsync(async(req,res,next)=>{
@@ -140,11 +142,7 @@ exports.resetPassword=catchAsync(async(req,res,next)=>{
     user.passwordResetExpire=undefined;
     await user.save()
 
-    const token =signToken(user._id)
-    res.status(200).json({
-        status:'success',
-        token
-    })
+    sendToken(user,200,res);
 
 })
 
@@ -161,10 +159,6 @@ exports.updatePassword = catchAsync(async(req,res,next)=>{
     user.password=req.body.password;
     user.confirmPassword=req.body.confirmPassword;
     await user.save()
-    const token =signToken(user._id)
-    res.status(200).json({
-        status:'success',
-        token
-    })
+    sendToken(user,200,res);
 
 })
