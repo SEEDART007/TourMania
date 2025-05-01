@@ -5,10 +5,11 @@ const tourRouter = require('./routes/tourRoute')
 const userRouter= require('./routes/userRoute')
 const AppError = require('./utils/appError')
 const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
 
 
 //middleware
-
+app.use(helmet())
 app.use(express.json())
 
 
