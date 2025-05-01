@@ -4,6 +4,7 @@ const globalErrorHandler = require('./controllers/errorController')
 const tourRouter = require('./routes/tourRoute')
 const userRouter= require('./routes/userRoute')
 const AppError = require('./utils/appError')
+const rateLimit = require('express-rate-limit')
 
 
 //middleware
@@ -11,10 +12,13 @@ const AppError = require('./utils/appError')
 app.use(express.json())
 
 
+const limiter = rateLimit({
+    max:100,
+    windowMs : 60*60*1000,
+    message:'too many request!!try again later'
+})
 
-
-
-
+app.use('/api',limiter)
 
 app.use('/api/tours',tourRouter)
 app.use('/api/users',userRouter)
