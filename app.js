@@ -6,11 +6,25 @@ const userRouter= require('./routes/userRoute')
 const AppError = require('./utils/appError')
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const sqlSanitizer = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+const hpp = require('hpp')
 
 
 //middleware
 app.use(helmet())
 app.use(express.json())
+//data sanitization for noSQL injections 
+
+app.use(sqlSanitizer())
+
+//for xss
+
+app.use(xss())
+
+//parameter preventions
+
+app.use(hpp())
 
 
 const limiter = rateLimit({
