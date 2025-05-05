@@ -3,6 +3,7 @@ const app = express()
 const globalErrorHandler = require('./controllers/errorController')
 const tourRouter = require('./routes/tourRoute')
 const userRouter= require('./routes/userRoute')
+const reviewRouter = require('./routes/reviewRoute')
 const AppError = require('./utils/appError')
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
@@ -37,6 +38,7 @@ app.use('/api',limiter)
 
 app.use('/api/tours',tourRouter)
 app.use('/api/users',userRouter)
+app.use('/api/reviews',reviewRouter)
 app.all('*',(req,res,next)=>{
     next(new AppError(`Can't find ${req.originalUrl}`,404));
 })
