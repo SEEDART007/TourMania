@@ -1,6 +1,7 @@
 const User = require("../models/userModel")
 const AppError = require("../utils/appError")
 const catchAsync = require("../utils/catchAsync")
+const factory = require('./handlerFactory')
 const filterObj = (obj,...allowedFields)=>{
     const newObj={}
     Object.keys(obj).forEach(el=>{
@@ -14,6 +15,7 @@ exports.getUser=catchAsync(async(req,res,next)=>{
     const user = await User.find()
     res.status(200).json({
         status:'success',
+        results:user.length,
         user
     })
 })
@@ -31,11 +33,4 @@ exports.updateMe = catchAsync(async(req,res,next)=>{
         updatedUser
     })
 })
-exports.deleteMe = catchAsync(async(req,res,next)=>{
-    const user = await User.findByIdAndUpdate(req.user.id,{active:false})
-
-    res.status(204).json({
-        status:'success',
-        message:"user account successfully deactivated"
-    })
-})
+exports.deleteMe = factory.deleteOne(User)

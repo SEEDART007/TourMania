@@ -102,6 +102,13 @@ tourSchema.virtual('durationWeeks').get(function(){
     return this.duration/7;
 })
 
+//virtual populate
+tourSchema.virtual('reviews',{
+    ref:'Review',
+    foreignField:'tour',
+    localField:'_id'
+})
+
 //for embedding users data in tours
 // tourSchema.pre('save',async function(next){
 //     const guidesPromise = this.guides.map(async id=>await User.findById(id))
