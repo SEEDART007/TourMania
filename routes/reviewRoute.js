@@ -4,7 +4,8 @@ const router = express.Router({mergeParams:true})
 const reviewController = require('../controllers/reviewContoller')
 const authController = require('../controllers/authController')
 router.route('/').get(authController.protect,authController.restrictTo('user'),reviewController.getAllReviews).post(authController.protect,authController.restrictTo('user'),reviewController.createReview)
-router.route('/:id').delete(reviewController.deleteReview)
+router.route('/:id').delete(reviewController.deleteReview).patch(reviewController.updateReview).get(reviewController.getReview)
+
 
 
 module.exports=router;

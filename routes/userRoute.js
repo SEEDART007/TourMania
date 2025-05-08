@@ -11,7 +11,10 @@ router.post('/forgotpassword',authController.forgotPassword)
 router.patch('/resetpassword/:token',authController.resetPassword)
 router.patch('/updateMyPassword',authController.protect,authController.updatePassword)
 router.patch('/updateMe',authController.protect,userController.updateMe)
-router.delete('/deleteMe/:id',authController.protect,userController.deleteMe)
+router.delete('/deleteMe',authController.protect,userController.deleteMe)
+router.delete('/deleteMe/:id',authController.protect,authController.restrictTo('admin'),userController.deleteMe)
+router.route('/updateMe/:id').patch(authController.protect,authController.restrictTo('admin'),userController.updateUser)
+router.route('/createUser/:id',userController.createUser)
 
 
 
