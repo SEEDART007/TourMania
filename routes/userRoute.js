@@ -15,7 +15,7 @@ router.patch('/updateMe',authController.protect,userController.updateMe)
 router.delete('/deleteMe',authController.protect,userController.deleteMe)
 router.delete('/deleteMe/:id',authController.protect,authController.restrictTo('admin'),userController.deleteMe)
 router.route('/updateMe/:id').patch(authController.protect,authController.restrictTo('admin'),userController.updateUser)
-router.route('/createUser/:id',userController.createUser)
+router.route('/createUser/:id',authController.protect,userController.createUser)
 
 
 

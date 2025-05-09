@@ -8,10 +8,10 @@ const reviewRouter = require('./../routes/reviewRoute')
 router.use("/:tourid/reviews",reviewRouter)
 router.route('/top-5-cheap').get(aliasTopTours,getAllTours)
 router.route('/get-stats').get(getTourStats)
-router.route('/').get(authController.protect,getAllTours).post(postTour)
-router.route('/:id').get(getASingleTour).put(updateTour).delete(authController.protect,authController.restrictTo('admin'),deleteTour)
-router.route('/monthly-plan/:year').get(getMonthlyPlan)
+router.route('/').get(getAllTours).post(authController.protect,authController.restrictTo('admin','lead-guide'),postTour)
+router.route('/:id').get(getASingleTour).put(authController.protect,authController.restrictTo('admin','lead-guide'),updateTour).delete(authController.protect,authController.restrictTo('admin'),deleteTour)
+router.route('/monthly-plan/:year').get(authController.protect,authController.restrictTo('admin','lead-guide','guide'),getMonthlyPlan)
 
 
-
+ 
 module.exports=router; 
