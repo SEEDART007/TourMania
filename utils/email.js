@@ -4,7 +4,7 @@ const sendEmail =async options =>{
     //1)create transporter
     // Looking to send emails in production? Check out our Email API/SMTP product!
 var transport = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
+    host: "smtp.example.com",
     port: 2525,
     auth: {
       user: "38a47af3aa0444",
