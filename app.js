@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const app = express()
 const globalErrorHandler = require('./controllers/errorController')
 const tourRouter = require('./routes/tourRoute')
@@ -11,6 +12,13 @@ const sqlSanitizer = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const hpp = require('hpp')
 
+app.set('view engine','pug')
+app.set('views',path.join(__dirname,'views'))
+app.use(express.static(path.join(__dirname,'public')))
+
+app.get('/',(req,res)=>{
+    res.status(200).render('base')
+})
 
 //middleware
 app.use(helmet())
